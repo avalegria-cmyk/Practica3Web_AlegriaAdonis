@@ -19,7 +19,7 @@
                         echo "<td>" . $resultados[$i]->nombre . "</td>";
                         echo "<td>" . $resultados[$i]->precio . "</td>";
                         echo "<td>" . $resultados[$i]->cantidad . "</td>";
-                        echo "<td><a href=\"/mvc/index.php/producto/actualizar?id="
+                        echo "<td><a href=\"/6TO/Integracion%20TEC/mvc_proyecto/index.php/producto/actualizar?id="
                             . $resultados[$i]->idProducto . "\"><i class='fa fa-edit'></i></a></td>";
                         echo "<td><span class='remover-producto' data-producto=\""
                             . $resultados[$i]->idProducto . "\"><i class='fa fa-remove'></i></span></td>";

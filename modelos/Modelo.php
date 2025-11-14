@@ -1,7 +1,8 @@
 <?php
 require_once "Conexion.php";
 
-class Modelo {
+class Modelo
+{
 
     public $idNombre = "id";
     public $atributos = [];
@@ -10,7 +11,8 @@ class Modelo {
     protected $nombreTabla = "producto";
     protected $conexion;
 
-    function __construct($id = "") {
+    function __construct($id = "")
+    {
 
         $this->conexion = new Conexion();
         $this->nombreTabla = ucfirst($this->nombreTabla);
@@ -21,7 +23,8 @@ class Modelo {
         }
     }
 
-    public function setAtributos($modelo) {
+    public function setAtributos($modelo)
+    {
         $this->atributos = $modelo;
 
         if (!empty($modelo)) {
@@ -31,7 +34,8 @@ class Modelo {
         }
     }
 
-    public function validar() {
+    public function validar()
+    {
         $noError = true;
 
         foreach ($this->atributos as $key => $value) {
@@ -44,16 +48,22 @@ class Modelo {
     }
 
     public function insertar() {
-        $campos  = implode(",", $this->nombreAtributos);
-        $valores = $this->valores();
+    // columnas que se van a insertar
+    $campos  = implode(",", $this->nombreAtributos);
 
-        $sql = "insert into {$this->nombreTabla} ({$campos}) values({$valores})";
+    // valores para esas columnas
+    $valores = $this->valores();
 
-        $this->conexion->abrir();
-        $this->conexion->ejecutar($sql);
-    }
+    $sql = "INSERT INTO {$this->nombreTabla} ({$campos}) VALUES ({$valores})";
 
-    public function actualizar() {
+    $this->conexion->abrir();
+    $this->conexion->ejecutar($sql);
+}
+
+
+
+    public function actualizar()
+    {
         $set = $this->valoresActualizar();
 
         $sql = "update {$this->nombreTabla} set {$set} where {$this->idNombre} = {$this->id}";
@@ -62,14 +72,16 @@ class Modelo {
         $this->conexion->ejecutar($sql);
     }
 
-    public function eliminar() {
+    public function eliminar()
+    {
         $sql = "delete from {$this->nombreTabla} where {$this->idNombre} = {$this->id}";
 
         $this->conexion->abrir();
         $this->conexion->ejecutar($sql);
     }
 
-    public function consultar() {
+    public function consultar()
+    {
         $campos = implode(",", $this->nombreAtributos);
         $sql = "select {$campos} from {$this->nombreTabla} where {$this->idNombre} = '" . $this->id . "'";
 
@@ -78,7 +90,8 @@ class Modelo {
         $this->setAtributos($this->conexion->extraerModelo());
     }
 
-    public function consultarTodo() {
+    public function consultarTodo()
+    {
         $campos = implode(",", $this->nombreAtributos);
         $sql = "select {$campos} from {$this->nombreTabla}";
 
@@ -97,23 +110,42 @@ class Modelo {
         return $registros;
     }
 
-    private function valoresActualizar() {
-        $valores = array();
+   private function valoresActualizar() {
+    $valores = [];
 
-        foreach ($this->atributos as $nombre => $value) {
-            $valores[] = "$nombre = '" . $value . "'";
+    foreach ($this->nombreAtributos as $campo) {
+
+        // no actualizamos el id
+        if ($campo == $this->idNombre) {
+            continue;
         }
 
-        return implode(",", $valores);
+        $valor = isset($this->atributos[$campo]) ? $this->atributos[$campo] : "";
+        $valores[] = "$campo = '" . $valor . "'";
     }
+
+    return implode(",", $valores);
+}
+
 
     private function valores() {
-        $valores = array();
+    $valores = [];
 
-        foreach ($this->atributos as $key => $value) {
-            $valores[] = "'$value'";
+    // recorro las columnas definidas en $nombreAtributos
+    foreach ($this->nombreAtributos as $campo) {
+
+        // si es el id autoincrement, dejamos que MySQL lo genere
+        if ($campo == $this->idNombre) {
+            $valores[] = "NULL";
+        } else {
+            // tomo el valor que vino del formulario
+            $valor = isset($this->atributos[$campo]) ? $this->atributos[$campo] : "";
+            $valores[] = "'" . $valor . "'";
         }
-
-        return implode(",", $valores);
     }
+
+    return implode(",", $valores);
 }
+
+}
+
